@@ -1,44 +1,41 @@
-互兆容器项目部署程序
+即时通讯容器项目部署程序
 =================
 
-自动化部署互兆项目(初始化)
+自动化部署即时通讯项目
 ----------------------
 
 ### 1.编译运行镜像
 
 ```
-# 手动操作如下
-cd compose/django/
-docker build . -t alpine:3.6-passport
-cd -
-
-# 自动操作
+# 编译所需镜像
 make build
-make setup
 
-# 以上操作二选一即可
+# 自动启动项目(自动编译镜像)
+make setup
 ```
 
 ### 2.初始化数据
 
 ```
-# 初始化数据库
-docker-compose run --rm django python3 manage.py migrate
+# imserver 配置文件路径，根据注释配置即可
+configs/imserver
 
-# 更新静态文件(js, css, img等)
-docker-compose run --rm django python3 manage.py collectstatic --no-input
-
-# 创建超级管理员(需要手动输入)
-docker-compose run --rm django python3 manage.py createsuperuser
+# discovery 配置文件路径，根据注释配置即可
+configs/discovery
 ```
 
-### 3.运行互兆容器
+### 3.安装后启动/停止程序
 
 ```
-docker-compose up -d
+# 启动程序
+make start
+
+# 停止程序
+make stop
+
 ```
 
-备注： 以后重起服务使用下列命令行
+以后重起服务使用下列命令行
 ----------------------------
 
 ```
@@ -49,7 +46,6 @@ make 和 fab 命令自行百度吧。
 
 ### 服务端本地部署使用 make 命令
 ```bash
-make help - 查看各种帮助
 make setup - 安装基本依赖(初始化)
 make fetch - 更新版本库代码
 make build - 编译所需镜像
@@ -61,27 +57,26 @@ make destry - 销毁项目容器
 ```
 
 ### 客户端远程部署使用 fab 命令
+
 > 另外, `make help` 或者 `fab list` 查看命令行快捷工具帮助
 
 #### 首先修改 fabfile.py 的远程服务器 ssh 配置
+
 ```python
 env.roledefs = {
-    'dev': ['root@10.7.7.22'],
-    'pre': ['root@121.42.154.8'],
+    'dev': ['root@127.7.7.22'],
+    'pre': ['root@172.7.7.22'],
 }
 ```
 
 #### 更新代码, 同步到服务器, 重启容器
+
 ```bash
 fab -R dev pull sync migr rest
 ```
 
 #### 更新代码, 同步到服务器, 更新数据库, 重启容器
+
 ```bash
 fab -R pre pull sync migr rest
-```
-
-#### 更新文档
-```bash
-fab -R dev docs
 ```
