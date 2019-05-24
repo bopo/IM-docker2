@@ -18,29 +18,14 @@ services:
       - ./volumes/imserver/log:/var/log:Z
     command: /supervisor.sh
 
-  postgres:
+  mysql:
     restart: always
-    image: postgres:alpine
+    image: mysql:5.7.25
     volumes:
       - ./project/dbs:/var/lib/postgresql:Z
-    env_file: ./project/app/env.docker
-
-  django:
-    restart: always
-    image: django:passport
-    depends_on:
-      - postgres
-      - redis
-    links:
-      - postgres
-      - redis
-    ports:
-      - "5005:5005"  
-      - "9009:9009"  
-    volumes:
-      - ./project/app:/app:Z
-      - ./project/log:/var/log/:Z
-      - ./project/app/env.docker:/app/.env:Z
-      - ./project/etc/supervisor:/etc/supervisor:Z
-    env_file: ./project/app/env.docker
-    command: /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
+    environment: 
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=
+      - MYSQL_USER=
+      - MYSQL_PASSWORD=
+    command: --default-authentication-plugin=mysql_native_password
