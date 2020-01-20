@@ -20,8 +20,11 @@ doctor:
 destry:
 	docker-compose rm -a -f
 
-clean: clean-pyc
+distclean: clean
 	rm -rf build
+	rm -rf compose/imserv/target
+
+clean: clean-pyc
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -35,8 +38,8 @@ fetch:
 
 build: fetch
 	cp scripts/imserv/* build/imserv
-	cd build/imserv && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on make build
-	cp -R build/imserv/target compose/imserv/standard/target
+	cd build/imserv && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on make build && cd $(CWD)
+	cp -R build/imserv/target compose/imserv
 	docker build ./compose/imserv -t imserv:standard
 
 stop:
